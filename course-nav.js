@@ -2,7 +2,8 @@
 (() => {
  const courses = [
   {file:'index.html', label:'第一课 · 直线', title:'让模型学会一条直线', description:'参数、预测、误差与训练，从两个旋钮开始。'},
-  {file:'lesson-02.html', label:'第二课 · 转折', title:'从直线到转折', description:'看懂 ReLU，动手组合不同区间的变化。'}
+  {file:'lesson-02.html', label:'第二课 · 转折', title:'从直线到转折', description:'看懂 ReLU，动手组合不同区间的变化。'},
+  {file:'lesson-03.html', label:'第三课 · 神经网络', title:'从 ReLU 到神经网络', description:'跟着数值逐层计算，区分变宽与变深。'}
  ];
  const current = location.pathname.split('/').pop() || 'index.html';
  const dialog = document.createElement('dialog');
