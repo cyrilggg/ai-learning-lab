@@ -8,7 +8,7 @@
   $('single-flow').replaceChildren(...[['① 乘权重',`${fmt(x)} × (${fmt(w)}) = ${fmt(r.sum)}`],['② 加偏置',`${fmt(r.sum)} + (${fmt(b)}) = ${fmt(r.z)}`],['③ 经过 ReLU',`max(0, ${fmt(r.z)}) = ${fmt(r.value)}`]].map(([title,text])=>{const card=el('div',undefined,'flow-node');card.append(el('h3',title),el('p',text));return card;}));
  }
  let step=0;
- const descriptions={base:'1 个隐藏层，宽度为 2。h₁、h₂ 并列，都接收 x；输出层直接组合它们。',wide:'1 个隐藏层，宽度为 3。新增 h₃ 也接收 x，并以 0.5 的权重加入输出。层数没有增加。',deep:'2 个隐藏层，宽度依次为 2、1。新增 g 接收 h₁、h₂ 的结果，经过新的加权、偏置和 ReLU 后，再送给输出层。'};
+ const descriptions={base:'当前：原始结构。计算隐藏层时，留意 h₁、h₂ 各自从哪里取得输入。',wide:'当前：增加一个单元。找到新增的 h₃，查看它的输入来源，以及它在输出计算中的贡献。',deep:'当前：增加一层。找到新增的 g，逐层计算，观察它要等哪些结果准备好。'};
  function render(){
   const kind=$('structure').value,x=num('network-x'),r=M.forward(kind,x),last=r.layers.length-1;
   $('network-x-value').textContent=fmt(x);$('structure-note').textContent=descriptions[kind];
