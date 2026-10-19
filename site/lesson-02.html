@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="从截断负值、移动一个转折到叠加两个 ReLU，动手理解非线性为什么有用。"><title>第二课 · 从直线到转折｜AI 学习实验室</title><link rel="stylesheet" href="style.css"><script src="nonlinear-model.js" defer></script><script src="lesson-02.js" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="从截断负值、移动一个转折到叠加两个 ReLU，动手理解非线性为什么有用。"><title>第二课 · 从直线到转折｜AI 学习实验室</title><link rel="stylesheet" href="style.css"><script src="nonlinear-model.js" defer></script><script src="lesson-02.js" defer></script><script src="course-nav.js" defer></script></head>
 <body><a class="skip" href="#main">跳到课程</a>
-<header class="top"><a class="brand" href="./"><span class="brand-mark">∿</span>AI 学习实验室</a><nav aria-label="课程导航"><a href="index.html">第一课 · 直线</a><a href="lesson-02.html" aria-current="page">第二课 · 转折</a><a href="#check">小自测</a></nav></header>
+<header class="top"><a class="brand" href="./"><span class="brand-mark">∿</span>AI 学习实验室</a><button class="secondary directory-trigger" data-course-directory aria-haspopup="dialog">☰ 课程目录</button></header>
 <main id="main">
 <section class="intro"><div class="eyebrow">第二课 / 从一个转折开始</div><h1>从直线<br>到<span>转折。</span></h1><div class="intro-bottom"><p>如果输入增加，输出却不是一直按同样的速度变化，<br>一条直线还够用吗？</p><a class="primary link-button" href="#clip">先观察变化 ↓</a></div></section>
 <section class="orientation"><span>本课目标</span><p>看懂 ReLU 如何带来转折，以及多个转折怎样组合。</p><span>按理解程度推进 · 一天可学多课</span></section>

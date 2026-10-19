@@ -19,10 +19,22 @@ fs.mkdirSync(path.resolve(__dirname,'../artifacts'),{recursive:true});await page
 await page.setViewportSize({width:390,height:844});await page.evaluate(()=>scrollTo({top:0,behavior:'instant'}));await page.screenshot({path:path.resolve(__dirname,'../artifacts/mobile.png'),fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
 await page.setViewportSize({width:320,height:800});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
 assert.deepEqual(errors,[]);console.log('PASS: sliders, step, divergence guard, reset, convergence, local persistence, quiz, 390/320px layout, runtime');
+await page.locator('[data-course-directory]').click();
+assert.equal(await page.locator('dialog').isVisible(),true);
+assert.equal(await page.locator('dialog [aria-current="page"]').getAttribute('href'),'index.html');
+await page.keyboard.press('Escape');assert.equal(await page.locator('dialog').isVisible(),false);
+assert.equal(await page.locator('[data-course-directory]').evaluate(e=>e===document.activeElement),true);
+await page.locator('[data-course-directory]').click();
 await page.getByRole('link',{name:'第二课 · 转折',exact:true}).click();
 assert.match(await page.title(),/第二课/);
 for(const width of [1440,390,320]){
  await page.setViewportSize({width,height:900});
+ await page.locator('[data-course-directory]').click();
+ assert.equal(await page.locator('dialog [aria-current="page"]').getAttribute('href'),'lesson-02.html');
+ assert.equal(await page.locator('dialog').evaluate(e=>e.scrollWidth<=e.clientWidth),true);
+ await page.screenshot({path:path.resolve(__dirname,`../artifacts/directory-${width}.png`)});
+ await page.getByRole('button',{name:'关闭课程目录'}).click();
+ assert.equal(await page.locator('dialog').isVisible(),false);
  await page.locator('#probe').fill('0');assert.match(await page.locator('#clip-readout').innerText(),/先减 1：-1.0 → 负值归零后：0.0/);
  await page.locator('#probe').fill('2');assert.match(await page.locator('#clip-readout').innerText(),/负值归零后：1.0/);
  await page.locator('#turn').fill('2');await page.locator('#slope').fill('-1');await page.locator('#offset').fill('1');
@@ -45,6 +57,7 @@ for(const [id,wrong,right] of [['structure','rate','structure'],['slope','minus3
  await page.locator('#quiz-'+id).selectOption(right);await page.locator(`[data-check="${id}"]`).click();assert.ok((await page.locator('#feedback-'+id).innerText()).startsWith('对。'));
 }
 await page.locator('[data-goal="relu"]').check();await page.reload();assert.equal(await page.locator('[data-goal="relu"]').isChecked(),true);
+await page.locator('[data-course-directory]').click();
 await page.getByRole('link',{name:'第一课 · 直线',exact:true}).click();assert.equal(await page.locator('[data-goal="explain"]').isChecked(),true);
 assert.deepEqual(errors,[]);console.log('PASS: lesson navigation, ReLU controls, threshold and zero slope, exact fit, reset, all quiz branches, separate progress, desktop/390/320px, runtime');
 }finally{await browser.close();}
