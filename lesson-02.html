@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="从截断负值、移动一个转折到叠加两个 ReLU，动手理解非线性为什么有用。"><title>第二课 · 从直线到转折｜AI 学习实验室</title><link rel="stylesheet" href="style.css"><script src="nonlinear-model.js" defer></script><script src="lesson-02.js" defer></script></head>
+<body><a class="skip" href="#main">跳到课程</a>
+<header class="top"><a class="brand" href="./"><span class="brand-mark">∿</span>AI 学习实验室</a><nav aria-label="课程导航"><a href="index.html">第一课 · 直线</a><a href="lesson-02.html" aria-current="page">第二课 · 转折</a><a href="#check">小自测</a></nav></header>
+<main id="main">
+<section class="intro"><div class="eyebrow">第二课 / 从一个转折开始</div><h1>从直线<br>到<span>转折。</span></h1><div class="intro-bottom"><p>如果输入增加，输出却不是一直按同样的速度变化，<br>一条直线还够用吗？</p><a class="primary link-button" href="#clip">先观察变化 ↓</a></div></section>
+<section class="orientation"><span>本课目标</span><p>看懂 ReLU 如何带来转折，以及多个转折怎样组合。</p><span>按理解程度推进 · 一天可学多课</span></section>
+<p class="section-lead">前置概念：知道参数会影响预测，训练会调整参数。还不熟悉时，可先回到<a href="index.html#lab">第一课的两个旋钮</a>。本课分为三个短实验，可以随时停下来复述自己的发现。</p>
+
+<section class="lab-section" id="clip"><div class="section-top"><div><div class="eyebrow">实验 01 / 先看截断</div><h2>超过门槛，才开始增加</h2></div><p>想象记录“超过 1 的那部分量”。<br>输入没到 1 时记为 0；超过后，只记录多出来的部分。</p></div>
+<div class="lab-layout"><div class="plot-panel"><div class="plot-header"><span>虚线：直接减 1　实线：负值归零后</span></div><svg id="clip-chart" role="img" aria-label="x 减 1 与负值归零后的折线对照"></svg><p class="hint">圆点跟随输入旋钮。转折前，实线保持在零；转折后，两条线重合。</p></div><aside class="controls"><h3>移动输入，观察输出</h3><label for="probe">输入 x <output id="probe-value"></output></label><input id="probe" type="range" min="-1" max="4" step="0.1" value="0"><div id="clip-readout" class="status" aria-live="polite"></div><p class="hint">试试 x = 0、1、2。哪一段输出不再跟着输入变化？</p></aside></div>
+<div class="explanation"><h3>这一步叫 ReLU</h3><p>先得到一个数 z，再把负数变成 0，正数保持原样：<code>ReLU(z) = max(0, z)</code>。上图先算 <code>z = x − 1</code>，再经过 ReLU。在 x = 1 的位置，输出从“不变”变为“随输入增加”。</p><p>一条直线只有固定斜率；这里左右两段的斜率不同，无法用同一条直线表示。这就是本课要认识的<strong>非线性</strong>：整体不再是一条直线，尽管每一小段仍是直的。</p></div></section>
+
+<section class="lab-section" id="hinge"><div class="section-top"><div><div class="eyebrow">实验 02 / 控制一个转折</div><h2>三个参数，各管一种变化</h2></div><p>先只动一个旋钮，观察哪一部分改变。<br>虚线标出转折位置。</p></div>
+<div class="lab-layout"><div class="plot-panel"><div class="plot-header"><span id="hinge-equation" class="mono"></span></div><svg id="hinge-chart" role="img" aria-label="由转折点、转折后斜率和上下偏移控制的单个 ReLU"></svg><p id="hinge-description" class="hint" aria-live="polite"></p></div><aside class="controls"><h3>手动调三个参数</h3>
+<label for="turn">转折点 t <output id="turn-value"></output></label><input id="turn" type="range" min="0" max="4" step="0.1" value="1"><p class="hint">左右移动转折位置。</p>
+<label for="slope">转折后斜率 a <output id="slope-value"></output></label><input id="slope" type="range" min="-2" max="3" step="0.1" value="1"><p class="hint">正数向上，负数向下；设为 0 时，转折消失。</p>
+<label for="offset">上下偏移 b <output id="offset-value"></output></label><input id="offset" type="range" min="-2" max="2" step="0.1" value="0"><p class="hint">整条线一起上下移动。</p><button id="hinge-reset" class="secondary">重置三个参数</button></aside></div>
+<div class="explanation"><p>把观察写成公式：<code>y = a × ReLU(x − t) + b</code>。这里恰好有<strong>三个参数 a、t、b</strong>。x 是输入，y 是输出，ReLU 是固定的计算规则。</p><p>无论怎样调这三个参数，这个模型最多只有一个转折，转折前都是水平的。调整参数可以移动、缩放形状，却不能凭空增加第二个转折。</p></div>
+<div class="quiz"><h3>动手挑战：先平，再往下</h3><p>让输出在 x = 2 前保持为 1，之后输入每增加 1，输出就减少 1。先自己调，再展开核对。</p><details><summary>查看一种设置</summary><p>t = 2、a = −1、b = 1。检查 x = 1、2、3 时，输出是否分别为 1、1、0。</p></details></div></section>
+
+<section class="lab-section" id="combine"><div class="section-top"><div><div class="eyebrow">实验 03 / 把两个转折相加</div><h2>先不变，再上升，最后下降</h2></div><p>圆点是固定的合成样本。<br>一个转折不够表达这两次变化。</p></div>
+<p class="section-lead">现在换一种结构：把两个 ReLU 单元的贡献相加，再加固定起点 1。为方便比较，转折点固定在 1 和 3，只调两个贡献的系数。下图中“贡献”可以为负：ReLU 本身不输出负数，但乘上负系数后可以。</p>
+<div class="lab-layout"><div class="plot-panel"><div class="plot-header"><span>① 蓝色虚线：第一个贡献　② 橙色点线：第二个贡献</span></div><svg id="parts-chart" role="img" aria-label="两个 ReLU 单元各自对输出的贡献"></svg><p id="parts-equation" class="hint mono"></p><div class="plot-header"><span>绿色实线：合成结果　灰色虚线：最佳直线　圆点：样本</span></div><svg id="sum-chart" role="img" aria-label="合成折线与最佳直线在固定样本上的拟合对比"></svg><p class="hint">上下两图共用纵轴刻度，方便对照。旋钮变化时刻度固定；所有数值均无单位。</p></div><aside class="controls"><h3>调整两个贡献</h3>
+<label for="first">第一个系数 a₁ <output id="first-value"></output></label><input id="first" type="range" min="-1" max="3" step="0.1" value="1"><p class="hint">从 x = 1 开始贡献斜率。</p>
+<label for="second">第二个系数 a₂ <output id="second-value"></output></label><input id="second" type="range" min="-4" max="2" step="0.1" value="0"><p class="hint">从 x = 3 开始叠加另一份斜率。</p>
+<div class="loss-readout"><span>合成模型 · 样本平均平方误差</span><strong id="combined-loss"></strong><small id="linear-loss"></small></div><p id="comparison" class="hint" aria-live="polite"></p><button id="show-fit" class="secondary">查看一组贴合参数</button><button id="combine-reset" class="secondary">重置两个系数</button></aside></div>
+<p id="sum-description" class="status" aria-live="polite"></p>
+<details class="calculation"><summary>“最佳直线”是怎样得到的？</summary><p id="line-explanation"></p><p>这里直接计算这 9 个样本上的最小二乘解，不是仅仅拿一条没训练好的直线来比较。它的整体斜率仍然固定，无法穿过全部折线样本。</p></details>
+<div class="explanation"><h3>非线性的好处：能表达分段变化</h3><p>如果只是把两条直线相加，结果仍是一条直线。有了 ReLU，单元能在不同位置开始贡献变化，多次变化叠加后，模型就能表达更丰富的关系。多个单元组合成分段直线，可以逐渐逼近一些曲线；单个 ReLU 并不等于任意曲线。</p><p>从一个单元换成两个单元，是<strong>改变结构</strong>；在选定结构里调整系数，是<strong>改变参数</strong>。本课由你手动调整，没有自动训练。实际训练也可以求梯度来调整参数，但 ReLU 的负值区间梯度为 0，在零点不可导，训练还需要处理这些细节。</p><h3>贴合这些点，不等于预测新数据更好</h3><p>这些无噪声样本特意来自两个转折的规则，所以合成模型能准确贴合。上面的误差只衡量这组用于调参数的样本，可以把它理解为训练误差；本实验没有验证集，不能据此判断泛化。实际建模需要用未参与调参的数据检验验证表现，更灵活的结构也可能拟合噪声、发生过拟合。</p></div></section>
+
+<section class="lesson-section" id="check"><div class="eyebrow">停下来，检查理解</div><h2>能说出原因，再继续</h2>
+<div class="quiz"><label for="quiz-structure">1. 想让模型拥有第二个转折，应怎样做？</label><div class="quiz-actions"><select id="quiz-structure"><option value="">选择你的判断</option><option value="rate">只把学习率调大</option><option value="structure">加入另一个 ReLU 单元并组合输出</option><option value="bias">只调整上下偏移 b</option></select><button class="secondary" data-check="structure">检查理解</button></div><p id="feedback-structure" aria-live="polite">先想想：哪些操作会改变模型能够表达的形状？</p></div>
+<div class="quiz"><label for="quiz-slope">2. 第一个系数为 2，第二个为 −3。x &gt; 3 时的总斜率是多少？</label><div class="quiz-actions"><select id="quiz-slope"><option value="">选择你的判断</option><option value="minus3">−3</option><option value="minus1">−1</option><option value="2">2</option></select><button class="secondary" data-check="slope">检查理解</button></div><p id="feedback-slope" aria-live="polite">第二个开始贡献后，第一个仍在贡献。</p></div>
+<div class="quiz"><label for="quiz-generalize">3. 在这些样本上误差为零，说明什么？</label><div class="quiz-actions"><select id="quiz-generalize"><option value="">选择你的判断</option><option value="all">任何新数据都会预测正确</option><option value="samples">贴合了这些样本，泛化仍需验证</option></select><button class="secondary" data-check="generalize">检查理解</button></div><p id="feedback-generalize" aria-live="polite">区分已经看过的数据与未参与调参的数据。</p></div>
+</section>
+<section class="lesson-section"><div class="eyebrow">本课完成条件</div><h2>用自己的话解释变化</h2><div class="completion"><label><input type="checkbox" data-goal="relu">我能用“负值归零”说明 ReLU，并解释它如何带来转折。</label><label><input type="checkbox" data-goal="parameters">我能完成三个参数的挑战，并区分调整参数与改变结构。</label><label><input type="checkbox" data-goal="generalization">我能解释两个贡献为何相加，也知道样本误差低不代表泛化更好。</label></div><p id="progress-status" class="hint" role="status"></p><p class="hint">仅保存到当前浏览器；由你确认理解，不会根据点击自动标记完成。可以回看，也可以在同一天继续学习。</p></section>
+<footer><p><a href="index.html">← 回到第一课：让模型学会一条直线</a></p><small>第二课 · 合成数据 · 所有交互均在浏览器内完成</small></footer>
+</main></body></html>
