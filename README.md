@@ -24,6 +24,10 @@
 
 ## 本地运行与入口
 
+第三课 `site/lesson-03.html` 从单个神经元开始，逐层显示真实输入、权重、偏置、ReLU 与输出；可以切换两个并列单元、变宽、变深三种固定结构。`site/network-model.js` 是计算源，`site/lesson-03.js` 控制展示。没有自动训练。第三课使用独立进度键 `ai-learning-lab.lesson-03.v1`。
+
+所有课程收纳在共享的 `site/course-nav.js` 侧边目录中；新增课程时更新该列表，保持顶部单一目录入口。
+
 直接打开 `site/index.html`，或在仓库目录运行 `python -m http.server 8080 --directory site`，访问 `http://localhost:8080`。
 
 网页无构建步骤、无第三方运行依赖、无 API 密钥。只发布 `site/`，浏览器清单不上传、不跨设备同步。

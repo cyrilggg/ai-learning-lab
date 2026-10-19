@@ -24,3 +24,22 @@ for(const a1 of [-1,3])for(const a2 of [-4,2])for(const {x} of N.samples){
  const y=N.combined(x,a1,a2);assert.ok(Number.isFinite(y)&&y>=-6&&y<=12);
 }
 console.log('PASS: ReLU threshold, hinge continuity, two-turn target, least-squares optimality, slider boundaries');
+const Net=require('../site/network-model.js');
+assert.equal(Net.neuron([4],[1],-1).value,3);
+assert.equal(Net.neuron([0],[1],-1).value,0);
+assert.deepEqual(Net.forward('base',4).layers[0].map(n=>n.value),[3,1]);
+assert.equal(Net.forward('base',4).output,3);
+assert.equal(Net.forward('wide',4).output,4);
+assert.equal(Net.forward('deep',4).output,2);
+assert.equal(Net.forward('base',8).output,-1); // No ReLU at the output.
+for(let x=-2;x<=5;x+=.5){
+ const h1=Math.max(0,x-1),h2=Math.max(0,x-3);
+ assert.equal(Net.forward('base',x).output,2*h1-3*h2);
+ assert.equal(Net.forward('wide',x).output,2*h1-3*h2+.5*Math.max(0,x-2));
+ assert.equal(Net.forward('deep',x).output,2*Math.max(0,h1-h2-1));
+ for(const kind of ['base','wide','deep']){
+  const r=Net.forward(kind,x);r.layers.forEach((layer,i)=>layer.forEach(n=>assert.deepEqual(n.inputs,i?r.layers[i-1].map(p=>p.value):[x])));
+ }
+}
+assert.throws(()=>Net.neuron([1,2],[1],0));
+console.log('PASS: network intermediate values, all structure equations, input boundaries, layer dependencies, linear output');

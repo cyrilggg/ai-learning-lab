@@ -60,5 +60,37 @@ await page.locator('[data-goal="relu"]').check();await page.reload();assert.equa
 await page.locator('[data-course-directory]').click();
 await page.getByRole('link',{name:'第一课 · 直线',exact:true}).click();assert.equal(await page.locator('[data-goal="explain"]').isChecked(),true);
 assert.deepEqual(errors,[]);console.log('PASS: lesson navigation, ReLU controls, threshold and zero slope, exact fit, reset, all quiz branches, separate progress, desktop/390/320px, runtime');
+await page.locator('[data-course-directory]').click();await page.getByRole('link',{name:'第三课 · 神经网络',exact:true}).click();
+assert.match(await page.title(),/第三课/);
+await page.locator('#single-x').fill('-2');assert.match(await page.locator('#single-flow').innerText(),/max\(0, -3\) = 0/);
+await page.locator('#single-x').fill('4');
+await page.locator('#single details').evaluate(e=>e.open=true);
+await page.locator('#single-w').fill('-2');await page.locator('#single-b').fill('2');assert.match(await page.locator('#single-flow').innerText(),/max\(0, -6\) = 0/);
+await page.locator('#single-w').fill('1');await page.locator('#single-b').fill('-1');await page.locator('#single details').evaluate(e=>e.open=false);
+for(const width of [1440,390,320]){
+ await page.setViewportSize({width,height:900});
+ for(const [kind,output,layers] of [['base',3,2],['wide',4,2],['deep',2,3]]){
+  await page.locator('#structure').selectOption(kind);await page.locator('#network-x').fill('4');
+  assert.equal(await page.locator('.flow-layer.pending').count(),layers);
+  await page.locator('#network-next').click();assert.equal(await page.locator('.flow-layer.pending').count(),layers-1);
+  assert.match(await page.locator('[data-node="h₁"]').innerText(),/h₁ = 3/);assert.match(await page.locator('[data-node="h₂"]').innerText(),/h₂ = 1/);
+  await page.locator('#network-all').click();assert.equal(await page.locator('.flow-layer.pending').count(),0);assert.equal(await page.locator('#network-next').isDisabled(),true);
+  assert.match(await page.locator('#network-status').innerText(),new RegExp('y = '+output));
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await page.locator('#network-flow').screenshot({path:path.resolve(__dirname,`../artifacts/network-${kind}-${width}.png`)});
+  await page.locator('#network-reset').click();assert.equal(await page.locator('.flow-layer.pending').count(),layers);
+  await page.locator('#network-x').fill('-2');await page.locator('#network-all').click();assert.match(await page.locator('#network-status').innerText(),/y = 0/);
+ }
+}
+for(const [id,wrong,right] of [['width','deep','wide'],['source','h1','x'],['output','6','2']]){
+ await page.locator(`[data-check="${id}"]`).click();assert.match(await page.locator('#feedback-'+id).innerText(),/先选择/);
+ await page.locator('#quiz-'+id).selectOption(wrong);await page.locator(`[data-check="${id}"]`).click();assert.ok(!(await page.locator('#feedback-'+id).innerText()).startsWith('对。'));
+ await page.locator('#quiz-'+id).selectOption(right);await page.locator(`[data-check="${id}"]`).click();assert.ok((await page.locator('#feedback-'+id).innerText()).startsWith('对。'));
+}
+await page.locator('[data-goal="flow"]').check();await page.reload();assert.equal(await page.locator('[data-goal="flow"]').isChecked(),true);
+await page.locator('[data-course-directory]').click();assert.equal(await page.locator('dialog [aria-current="page"]').getAttribute('href'),'lesson-03.html');
+await page.getByRole('link',{name:'第二课 · 转折',exact:true}).click();assert.equal(await page.locator('[data-goal="relu"]').isChecked(),true);
+await page.getByRole('link',{name:'继续第三课：从 ReLU 到神经网络 →',exact:true}).click();assert.match(await page.title(),/第三课/);
+assert.deepEqual(errors,[]);console.log('PASS: neuron controls, base/wide/deep forward steps, input reset, mobile layouts, lesson 3 quiz and progress, directory and lesson 2 onward link');
 }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
